@@ -1,30 +1,29 @@
 import React from 'react';
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from '@apollo/client';
+import { ListGroup } from 'reactstrap';
 
 import Blog from '../component/blog'
 
-const Blogs = () => (
-  <Query
-    query={gql`
-      {
-        allBlogs {
-          id
-          title
-          author
-          description
-        }
-      }
-    `}
-  >
-    {({ loading, error, data }) => {
-      if (loading) return <p>Loading...</p>;
-      if (error) return <p>Error :(</p>;
-      return data.allBlogs.map((blog) => (
-        <Blog blog={blog} />
-      ));
-    }}
-  </Query>
-);
+const GET_BLOGS = gql`
+  query GetBlogs {
+    blogs {
+      id
+      title
+      description
+    }
+  }
+`;
+
+const Blogs = () => {
+  const { loading, error, data } = useQuery(GET_BLOGS);
+  if (loading) return 'Loading...';
+  if (error) return `Error! ${error.message}`;
+
+  return data.blogs.map((blog) => (
+    <ListGroup>
+      <Blog blog={blog} />
+    </ListGroup>
+  ));
+};
 
 export default Blogs;
